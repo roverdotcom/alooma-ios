@@ -199,6 +199,22 @@
 - (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString*)url launchOptions:(NSDictionary *)launchOptions andFlushInterval:(NSUInteger)flushInterval;
 
 /*!
+@method
+
+@abstract
+Initializes an instance of the API with the given project token.
+
+@discussion
+Supports for the old initWithToken method format but really just passes
+launchOptions to the above method as nil.
+
+@param apiToken        your project token
+@param customHeaders   headers to be sent together the track calls
+@param url             your server url
+*/
+- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders;
+
+/*!
  @method
 
  @abstract

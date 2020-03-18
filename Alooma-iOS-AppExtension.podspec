@@ -9,12 +9,12 @@
 
 Pod::Spec.new do |s|
   s.name             = "Alooma-iOS-AppExtension"
-  s.version          = "0.1.3"
+  s.version          = "0.2.0"
   s.summary          = "An iOS library for sending events to Alooma"
-  s.homepage         = "https://github.com/aloomaio/iossdk.git"
+  s.homepage         = "https://github.com/roverdotcom/alooma-ios.git"
   s.license          = 'Apache License, Version 2.0'
   s.author           = { "Alooma Inc" => "info@alooma.com" }
-  s.source           = { :git => "https://github.com/aloomaio/iossdk.git", :tag => "v#{s.version}" }
+  s.source           = { :git => "https://github.com/roverdotcom/alooma-ios.git", :tag => "v#{s.version}" }
   s.social_media_url = 'https://twitter.com/aloomainc'
 
   s.platform     = :ios, '6.0'

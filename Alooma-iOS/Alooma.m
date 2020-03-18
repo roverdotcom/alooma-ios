@@ -43,6 +43,7 @@ static NSString * const kSendingTimeKey = @"sending_time";
 @property (nonatomic, strong) CTTelephonyNetworkInfo *telephonyInfo;
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSMutableDictionary *timedEvents;
+@property (nonatomic, copy) NSDictionary<NSString *,NSString *> *customHeaders;
 
 @end
 
@@ -114,6 +115,12 @@ static Alooma *sharedInstance = nil;
         }
     }
     return self;
+}
+
+- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders {
+    self.customHeaders = customHeaders;
+
+    return [self initWithToken:apiToken serverURL:url andFlushInterval:60];
 }
 
 - (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url andFlushInterval:(NSUInteger)flushInterval
@@ -585,6 +592,7 @@ static __unused NSString *MPURLEncode(NSString *s)
 {
     NSURL *URL = [NSURL URLWithString:[self.serverURL stringByAppendingString:endpoint]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    [request setAllHTTPHeaderFields:self.customHeaders];
     [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
