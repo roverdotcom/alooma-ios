@@ -217,7 +217,7 @@ launchOptions to the above method as nil.
 @param customHeaders   headers to be sent together the track calls
 @param url             your server url
 */
-- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders;
+- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary<NSString *,NSString *> *)customHeaders postFormat:(PostFormat)postFormat;
 
 /*!
  @method

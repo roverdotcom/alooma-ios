@@ -118,7 +118,7 @@ static Alooma *sharedInstance = nil;
     return self;
 }
 
-- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders postFormat:(PostFormat)postFormat {
+- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary<NSString *,NSString *> *)customHeaders postFormat:(PostFormat)postFormat {
     self.customHeaders = customHeaders;
     self.postFormat = postFormat;
 
