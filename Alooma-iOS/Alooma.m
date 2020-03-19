@@ -568,7 +568,7 @@ static __unused NSString *MPURLEncode(NSString *s)
         }
 
         // Create request
-        NSURLRequest *request;
+        NSMutableURLRequest *request;
 
         if (self.postFormat && self.postFormat == PostFormatJSON) {
             NSString *postBody = [self encodeAPIDataUsingJSONFormat:batch];
