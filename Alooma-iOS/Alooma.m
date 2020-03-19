@@ -568,16 +568,12 @@ static __unused NSString *MPURLEncode(NSString *s)
         }
 
         // Create request
-        NSMutableURLRequest *request;
+        NSURLRequest *request;
 
         if (self.postFormat && self.postFormat == PostFormatJSON) {
             NSData *requestData = [self encodeAPIDataUsingJSONFormat:batch];
-            NSString *postBody = [[NSString alloc] initWithData:requestData encoding:NSUTF8StringEncoding];
-            NSLog(@"DATA: %@", requestData);
-            NSLog(@"STRING: %@", postBody);
             AloomaDebug(@"%@ flushing JSON %lu of %lu to %@: %@", self, (unsigned long)[batch count], (unsigned long)[queue count], endpoint, queue);
-            request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
-            [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+            request = [self apiRequestWithEndpoint:endpoint andDataBody:requestData];
         } else { // Base64
             NSString *requestData = [self encodeAPIDataUsingBase64Format:batch];
             NSString *postBody = [NSString stringWithFormat:@"ip=1&data=%@", requestData];
@@ -617,6 +613,19 @@ static __unused NSString *MPURLEncode(NSString *s)
     [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    AloomaDebug(@"%@ http request: %@?%@", self, URL, body);
+    return request;
+}
+
+- (NSURLRequest *)apiRequestWithEndpoint:(NSString *)endpoint andDataBody:(NSData *)body
+{
+    NSURL *URL = [NSURL URLWithString:[self.serverURL stringByAppendingString:endpoint]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    [request setAllHTTPHeaderFields:self.customHeaders];
+    [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:body];
     AloomaDebug(@"%@ http request: %@?%@", self, URL, body);
     return request;
 }
