@@ -571,7 +571,8 @@ static __unused NSString *MPURLEncode(NSString *s)
         NSMutableURLRequest *request;
 
         if (self.postFormat && self.postFormat == PostFormatJSON) {
-            NSString *postBody = [self encodeAPIDataUsingJSONFormat:batch];
+            NSData *requestData = [self encodeAPIDataUsingJSONFormat:batch];
+            NSString *postBody = [NSString stringWithUTF8String:[requestData bytes]];
             AloomaDebug(@"%@ flushing JSON %lu of %lu to %@: %@", self, (unsigned long)[batch count], (unsigned long)[queue count], endpoint, queue);
             request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
             [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
