@@ -214,7 +214,7 @@ static __unused NSString *MPURLEncode(NSString *s)
 }
 
 - (NSData *)encodeAPIDataUsingJSONFormat:(NSArray *)array {
-    NSData *data = [self JSONSerializeObject:array];
+    return [self JSONSerializeObject:array];
 }
 
 - (NSString *)encodeAPIDataUsingBase64Format:(NSArray *)array
