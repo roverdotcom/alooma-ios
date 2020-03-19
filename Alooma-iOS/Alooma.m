@@ -44,6 +44,7 @@ static NSString * const kSendingTimeKey = @"sending_time";
 @property (nonatomic, strong) NSDateFormatter *dateFormatter;
 @property (nonatomic, strong) NSMutableDictionary *timedEvents;
 @property (nonatomic, copy) NSDictionary<NSString *,NSString *> *customHeaders;
+@property (nonatomic) PostFormat *postFormat;
 
 @end
 
@@ -117,8 +118,9 @@ static Alooma *sharedInstance = nil;
     return self;
 }
 
-- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders {
+- (instancetype)initWithToken:(NSString *)apiToken serverURL:(NSString *)url customHeaders:(NSDictionary *)customHeaders postFormat:(PostFormat)postFormat {
     self.customHeaders = customHeaders;
+    self.postFormat = postFormat;
 
     return [self initWithToken:apiToken serverURL:url andFlushInterval:60];
 }
@@ -211,7 +213,11 @@ static __unused NSString *MPURLEncode(NSString *s)
     return s;
 }
 
-- (NSString *)encodeAPIData:(NSArray *)array
+- (NSData *)encodeAPIDataUsingJSONFormat:(NSArray *)array {
+    NSData *data = [self JSONSerializeObject:array];
+}
+
+- (NSString *)encodeAPIDataUsingBase64Format:(NSArray *)array
 {
     NSString *b64String = @"";
     NSData *data = [self JSONSerializeObject:array];
@@ -560,11 +566,23 @@ static __unused NSString *MPURLEncode(NSString *s)
             properties[kSendingTimeKey] = @(round(epochInterval));
             [event setObject:[NSDictionary dictionaryWithDictionary:properties] forKeyedSubscript:@"properties"];
         }
-        
-        NSString *requestData = [self encodeAPIData:batch];
-        NSString *postBody = [NSString stringWithFormat:@"ip=1&data=%@", requestData];
-        AloomaDebug(@"%@ flushing %lu of %lu to %@: %@", self, (unsigned long)[batch count], (unsigned long)[queue count], endpoint, queue);
-        NSURLRequest *request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
+
+        // Create request
+        NSURLRequest *request;
+
+        if (self.postFormat && self.postFormat == PostFormatJSON) {
+            NSString *postBody = [self encodeAPIDataUsingJSONFormat:batch];
+            AloomaDebug(@"%@ flushing JSON %lu of %lu to %@: %@", self, (unsigned long)[batch count], (unsigned long)[queue count], endpoint, queue);
+            request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
+            [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        } else { // Base64
+            NSString *requestData = [self encodeAPIDataUsingBase64Format:batch];
+            NSString *postBody = [NSString stringWithFormat:@"ip=1&data=%@", requestData];
+            AloomaDebug(@"%@ flushing Base64 %lu of %lu to %@: %@", self, (unsigned long)[batch count], (unsigned long)[queue count], endpoint, queue);
+            request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
+        }
+
+
         NSError *error = nil;
 
         [self updateNetworkActivityIndicator:YES];

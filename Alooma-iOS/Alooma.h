@@ -4,6 +4,11 @@
 
 @protocol AloomaDelegate;
 
+typedef NS_ENUM(NSInteger, PostFormat) {
+  PostFormatBase64,
+  PostFormatJSON
+};
+
 /*!
  @class
  Mixpanel API.
