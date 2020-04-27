@@ -843,10 +843,7 @@ static __unused NSString *MPURLEncode(NSString *s)
 + (BOOL)inBackground
 {
 #if !defined(ALOOMA_APP_EXTENSION)
-    dispatch_async(dispatch_get_main_queue(), ^{
-        return [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
-    });
-
+    return [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
 #else
     return NO;
 #endif
