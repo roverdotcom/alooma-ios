@@ -843,7 +843,10 @@ static __unused NSString *MPURLEncode(NSString *s)
 + (BOOL)inBackground
 {
 #if !defined(ALOOMA_APP_EXTENSION)
-    return [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        return [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    });
+
 #else
     return NO;
 #endif
@@ -853,7 +856,9 @@ static __unused NSString *MPURLEncode(NSString *s)
 {
 #if !defined(ALOOMA_APP_EXTENSION)
     if (_showNetworkActivityIndicator) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = on;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = on;
+        });
     }
 #endif
 }
