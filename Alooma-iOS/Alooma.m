@@ -843,7 +843,16 @@ static __unused NSString *MPURLEncode(NSString *s)
 + (BOOL)inBackground
 {
 #if !defined(ALOOMA_APP_EXTENSION)
-    return [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+
+    __block BOOL isBackground;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        isBackground = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+        dispatch_semaphore_signal(semaphore);
+    });
+    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+
+    return isBackground;
 #else
     return NO;
 #endif

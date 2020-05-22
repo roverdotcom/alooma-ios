@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "Alooma-iOS-AppExtension"
-  s.version          = "0.2.2"
+  s.version          = "0.2.3"
   s.summary          = "An iOS library for sending events to Alooma"
   s.homepage         = "https://github.com/roverdotcom/alooma-ios.git"
   s.license          = 'Apache License, Version 2.0'
