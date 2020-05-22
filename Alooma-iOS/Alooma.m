@@ -553,7 +553,11 @@ static __unused NSString *MPURLEncode(NSString *s)
             endpoint:@"/track/"];
 }
 
-- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint
+- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint {
+    [self flushQueue:queue endpoint:endpoint retryCount:0];
+}
+
+- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint retryCount:(NSInteger)retryCount
 {
     while ([queue count] > 0) {
         NSUInteger batchSize = ([queue count] > 50) ? 50 : [queue count];
@@ -587,7 +591,7 @@ static __unused NSString *MPURLEncode(NSString *s)
         [self updateNetworkActivityIndicator:YES];
 
         NSURLResponse *urlResponse = nil;
-        NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
+        NSData *responseData = [Alooma sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
 
         [self updateNetworkActivityIndicator:NO];
 
@@ -603,6 +607,33 @@ static __unused NSString *MPURLEncode(NSString *s)
 
         [queue removeObjectsInArray:batch];
     }
+}
+
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSURLResponse * _Nullable *)response error:(NSError * _Nullable *)error {
+    return [self sendSynchronousRequest:request returningResponse:response error:error retryCount:0];
+}
+
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSHTTPURLResponse * _Nullable *)response error:(NSError * _Nullable *)error retryCount:(NSInteger)retryCount {
+
+    NSHTTPURLResponse *callResponse;
+    NSError *callError;
+
+    NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&callResponse error:&callError];
+
+    if (NSLocationInRange(callResponse.statusCode, NSMakeRange(500, 599))) {
+        if (retryCount <= 5) {
+            [Alooma sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
+            return nil;
+        } else {
+            AloomaError(@"%@ network failure: Can't send queue", self);
+            // Notify
+        }
+    }
+
+    *response = callResponse;
+    *error = callError;
+
+    return data;
 }
 
 - (NSURLRequest *)apiRequestWithEndpoint:(NSString *)endpoint andBody:(NSString *)body
@@ -877,8 +908,8 @@ static __unused NSString *MPURLEncode(NSString *s)
 {
     // wifi reachability
     BOOL reachabilityOk = NO;
-    NSURL* url = [NSURL URLWithString:self.serverURL]; 
-    NSString* host = [url host]; 
+    NSURL* url = [NSURL URLWithString:self.serverURL];
+    NSString* host = [url host];
     if ((_reachability = SCNetworkReachabilityCreateWithName(NULL, host.UTF8String)) != NULL) {
         SCNetworkReachabilityContext context = {0, (__bridge void*)self, NULL, NULL, NULL};
         if (SCNetworkReachabilitySetCallback(_reachability, AloomaReachabilityCallback, &context)) {
