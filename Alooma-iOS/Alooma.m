@@ -553,11 +553,7 @@ static __unused NSString *MPURLEncode(NSString *s)
             endpoint:@"/track/"];
 }
 
-- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint {
-    [self flushQueue:queue endpoint:endpoint retryCount:0];
-}
-
-- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint retryCount:(NSInteger)retryCount
+- (void)flushQueue:(NSMutableArray *)queue endpoint:(NSString *)endpoint
 {
     while ([queue count] > 0) {
         NSUInteger batchSize = ([queue count] > 50) ? 50 : [queue count];
@@ -622,8 +618,7 @@ static __unused NSString *MPURLEncode(NSString *s)
 
     if (NSLocationInRange(callResponse.statusCode, NSMakeRange(500, 599))) {
         if (retryCount <= 5) {
-            [Alooma sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
-            return nil;
+            return [Alooma sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
         } else {
             AloomaError(@"%@ network failure: Can't send queue", self);
             // Notify
