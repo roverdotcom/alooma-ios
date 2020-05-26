@@ -621,7 +621,7 @@ static __unused NSString *MPURLEncode(NSString *s)
         } else {
             // Report error
             __strong id<AloomaDelegate> strongDelegate = self.delegate;
-            if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(aloomaError:)]) {
+            if (strongDelegate) {
                 NSError *error = [NSError errorWithDomain:@"Alooma" code:callResponse.statusCode userInfo:@{NSLocalizedDescriptionKey: @"Alooma tried 5 times to report unsucessfully.", @"response": callResponse, @"error": callError}];
                 [strongDelegate aloomaError:error];
             }

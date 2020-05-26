@@ -542,6 +542,8 @@ launchOptions to the above method as nil.
  your code.
  */
 @protocol AloomaDelegate <NSObject>
+- (void)aloomaError:(NSError *)error;
+
 @optional
 
 /*!
@@ -556,6 +558,5 @@ launchOptions to the above method as nil.
  @param mixpanel        Mixpanel API instance
  */
 - (BOOL)aloomaWillFlush:(Alooma *)mixpanel;
-- (void)aloomaError:(NSError *)error;
 
 @end
