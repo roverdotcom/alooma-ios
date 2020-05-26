@@ -18,7 +18,7 @@
 #import "AloomaLogger.h"
 #import "NSData+AloomaBase64.h"
 
-#define VERSION @"0.1.1"
+#define VERSION @"0.2.4"
 
 static NSString * const kSendingTimePlaceHolder = @"<SendingTimePlaceHolder>";
 static NSString * const kSendingTimeKey = @"sending_time";
