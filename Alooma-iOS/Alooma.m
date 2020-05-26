@@ -581,13 +581,12 @@ static __unused NSString *MPURLEncode(NSString *s)
             request = [self apiRequestWithEndpoint:endpoint andBody:postBody];
         }
 
-
         NSError *error = nil;
 
         [self updateNetworkActivityIndicator:YES];
 
         NSURLResponse *urlResponse = nil;
-        NSData *responseData = [Alooma sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
+        NSData *responseData = [self sendSynchronousRequest:request returningResponse:&urlResponse error:&error];
 
         [self updateNetworkActivityIndicator:NO];
 
@@ -605,11 +604,11 @@ static __unused NSString *MPURLEncode(NSString *s)
     }
 }
 
-+ (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSURLResponse * _Nullable *)response error:(NSError * _Nullable *)error {
+- (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSURLResponse * _Nullable *)response error:(NSError * _Nullable *)error {
     return [self sendSynchronousRequest:request returningResponse:response error:error retryCount:0];
 }
 
-+ (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSHTTPURLResponse * _Nullable *)response error:(NSError * _Nullable *)error retryCount:(NSInteger)retryCount {
+- (NSData *)sendSynchronousRequest:(NSURLRequest *)request returningResponse:(NSHTTPURLResponse * _Nullable *)response error:(NSError * _Nullable *)error retryCount:(NSInteger)retryCount {
 
     NSHTTPURLResponse *callResponse;
     NSError *callError;
@@ -618,10 +617,14 @@ static __unused NSString *MPURLEncode(NSString *s)
 
     if (NSLocationInRange(callResponse.statusCode, NSMakeRange(500, 599))) {
         if (retryCount <= 5) {
-            return [Alooma sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
+            return [self sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
         } else {
-            AloomaError(@"%@ network failure: Can't send queue", self);
-            // Notify
+            // Report error
+            __strong id<AloomaDelegate> strongDelegate = self.delegate;
+            if (strongDelegate != nil && [strongDelegate respondsToSelector:@selector(aloomaError:)]) {
+                NSError *error = [NSError errorWithDomain:@"Alooma" code:callResponse.statusCode userInfo:@{NSLocalizedDescriptionKey: @"Alooma got 5+ times a 500 response code from server. Cancelling report."}];
+                [strongDelegate aloomaError:error];
+            }
         }
     }
 

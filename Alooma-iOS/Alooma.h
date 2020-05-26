@@ -288,7 +288,7 @@ launchOptions to the above method as nil.
 
 /*!
  @method
- 
+
  @abstract
  Arguments will allow you to segment your events in your Mixpanel reports.
  Argument keys must be <code>NSString</code> objects and values must be
@@ -296,9 +296,9 @@ launchOptions to the above method as nil.
  <code>NSArray</code>, <code>NSDictionary</code>, <code>NSDate</code> or
  <code>NSURL</code> objects. If the event is being timed, the timer will
  stop and be added as a property.
- 
+
  @param properties           arguments dictionary
- 
+
  */
 - (void)trackCustomEvent:(NSDictionary *)customEvent;
 
@@ -323,10 +323,10 @@ launchOptions to the above method as nil.
 
 /*!
  @method
- 
+
  @abstract
  Tracks an event with properties.
- 
+
  @discussion
  Properties will allow you to segment your events in your Mixpanel reports.
  Property keys must be <code>NSString</code> objects and values must be
@@ -334,7 +334,7 @@ launchOptions to the above method as nil.
  <code>NSArray</code>, <code>NSDictionary</code>, <code>NSDate</code> or
  <code>NSURL</code> objects. If the event is being timed, the timer will
  stop and be added as a property.
- 
+
  @param event           event name
  @param properties      properties dictionary
  */
@@ -556,5 +556,6 @@ launchOptions to the above method as nil.
  @param mixpanel        Mixpanel API instance
  */
 - (BOOL)aloomaWillFlush:(Alooma *)mixpanel;
+- (void)aloomaError:(NSError *)error;
 
 @end
