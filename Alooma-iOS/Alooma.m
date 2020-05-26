@@ -616,7 +616,7 @@ static __unused NSString *MPURLEncode(NSString *s)
     NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&callResponse error:&callError];
 
     if (!callResponse.statusCode || NSLocationInRange(callResponse.statusCode, NSMakeRange(500, 599))) {
-        if (retryCount <= 5) {
+        if (retryCount < 5) {
             return [self sendSynchronousRequest:request returningResponse:response error:error retryCount:retryCount + 1];
         } else {
             // Report error
